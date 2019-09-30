@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#argument parsing
+
+flagcount=0
+force=0
+
+while getopts ":fu" opt; do
+	case $opt in
+	f)
+		echo "Force!"
+		force=1
+		((flagcount++))
+		;;
+	u)
+		sudo -k pacman -Syu
+		((flagcount++))
+		;;
+	\?)
+		echo "invalid option!"
+		;;
+	esac
+done
+
+
+cd ~/aur/packages
+echo `pwd`
+# get names of packages to be updated
+# if there are more cmd args than flags parsed, the remaining are treated as package names
+if (("$#" > "$flagcount")); then
+	DIRECTS="$@"
+# if no option or only flags are specified, update all
+else
+	DIRECTS="$(ls -I *.sh)" 
+fi
+echo directories: $DIRECTS
+# turn space delimited list into newline delimited list for easy iteration and remove any flags given
+DIRECTS=$(echo $DIRECTS | tr ' ' '\n' | grep -e '^-' -v)
+echo directories: $DIRECTS
+
+#iterate over packages and update each
+for DIRECT in $DIRECTS
+do
+	#check if package directory already exists (update) or not (install)
+	if [ -d $DIRECT ]; then
+	# package exists, we need to update
+		echo updating $DIRECT
+		if [ "$force" -eq "1" ]; then
+			# force update
+			echo removing old install files
+			rm -rf ./$DIRECT
+			echo cloning aur repo package
+			git clone https://aur.archlinux.org/$DIRECT.git
+	  else
+	  	# if no force, update git repo
+	  	cd $DIRECT
+	  	git pull
+	  	cd ..
+		fi
+	else
+		echo installing $DIRECT
+		git clone https://aur.archlinux.org/$DIRECT.git
+	fi
+	echo `pwd`
+	cd $DIRECT
+	echo running makepkg
+	makepkg -si --needed
+	echo makepkg return $?
+	sudo -k
+	cd ..
+
+done
+echo done

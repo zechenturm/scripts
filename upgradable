@@ -1,0 +1,11 @@
+#!/bin/bash
+
+numPkg=`pacman -Qu | wc -l`
+# numPkg=50
+if  (("$numPkg" == "0")) ; then
+    echo "✔️"
+elif (( "$numPkg" > "20" )); then 
+    echo "$numPkg❗"
+else
+    echo "$numPkg"
+fi
