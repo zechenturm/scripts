@@ -1,0 +1,13 @@
+#!/bin/bash
+
+while [ true ]
+do
+	echo CPU
+	cat /proc/pressure/cpu
+	echo MEM
+	cat /proc/pressure/memory
+	echo IO
+	cat /proc/pressure/io
+	sleep 1
+	tput cuu 8
+done
