@@ -1,0 +1,11 @@
+#KNLVER=`uname -r | grep -o '[0-9]*\.[0-9]*\.[0-9]*-[a-z]*[0-9]*-[0-9]*'`
+#PKGVER=`pacman -Q | grep '^linux ' | grep -o '[0-9].*'`
+
+KNLVER=`uname -r | grep -o [0-9]`
+PKGVER=`pacman -Q | grep '^linux ' | grep -o [0-9]`
+
+if [ "$KNLVER" == "$PKGVER" ]; then
+	echo "OK"
+else
+	echo "needed"
+fi
