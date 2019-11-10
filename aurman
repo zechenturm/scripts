@@ -2,10 +2,16 @@
 
 #argument parsing
 
+#number of command line flags specified
 flagcount=0
+# force update?
 force=0
+# remove rather than isntall?
+remove=0
+#number of args that are not flags
+extra_args=0
 
-while getopts ":fu" opt; do
+while getopts ":fur" opt; do
 	case $opt in
 	f)
 		echo "Force!"
@@ -16,18 +22,48 @@ while getopts ":fu" opt; do
 		sudo -k pacman -Syu
 		((flagcount++))
 		;;
+	r)
+		remove=1
+		((flagcount++))
+		;;
 	\?)
 		echo "invalid option!"
 		;;
 	esac
 done
 
-
 cd ~/aur/packages
-echo `pwd`
+
+extra_args=$(($# - flagcount))
+
+#remove flags from args
+if ((extra_args > 0)); then
+	shift $flagcount
+fi
+
+if ((remove == 1)); then
+	if ((extra_args == 0)); then
+		echo "ERROR: specifiy at least 1 package to remove!"
+		exit 1
+	fi
+
+	echo "number of args $extra_args"
+	for pkg in "$@"
+	do
+		echo "removing $pkg"
+		if [ -d "$pkg" ]; then
+			echo "found aur download, removing..."
+			rm -rf $pkg
+		fi
+		sudo -k pacman -Rns $pkg
+	done
+
+	exit 0
+fi
+
 # get names of packages to be updated
 # if there are more cmd args than flags parsed, the remaining are treated as package names
-if (("$#" > "$flagcount")); then
+if ((extra_args > 0)); then
 	DIRECTS="$@"
 # if no option or only flags are specified, update all
 else
