@@ -1,0 +1,12 @@
+#!/bin/bash
+brightness=$(cat /home/moritz/.cache/brightness)
+
+if [[ brightness == "" ]]; then
+	brightness = 500
+fi
+
+let "brightness = brightness - 100"
+
+echo "${brightness}"  > /home/moritz/.cache/brightness
+
+echo "${brightness}" > /sys/class/backlight/intel_backlight/brightness
