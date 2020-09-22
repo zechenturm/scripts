@@ -1,0 +1,1 @@
+printf "poweroff\nhibernate\nsuspend\nrestart" | dmenu -l 4 -fn 'Liberation Mono:pixelsize=25' | xargs systemctl
