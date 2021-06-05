@@ -1,0 +1,11 @@
+#!/bin/sh
+
+defaultName=kitty
+
+name=$(echo "${defaultName}" | dmenu)
+if [[ "${name}" == "${defaultName}" ]]; then
+	# '-T' will override any title set by programs, so only use '-T' if a non-default name is specified
+	kitty
+else
+	kitty -T ${name}
+fi
